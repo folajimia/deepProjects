@@ -17,6 +17,11 @@ n_records, n_features = features.shape
 last_loss = None
 
 
+# Neural network hyper parameters
+n_hidden = 2
+epochs = 1000
+learnrate = 0.05
+
 #initialize weights
 #we'll initialize the weights from a normal distribution centered at 0. A good value for the scale is
 # 1/n^0.5 where n is the number of input units. This keeps the input to the sigmoid low for increasing
@@ -28,17 +33,14 @@ weights_input_hidden = np.random.normal(scale=1 / n_features**.5, size=(n_featur
 weights_hidden_output = np.random.normal(scale=1/ n_features**.5, size=n_hidden)
 
 
-# Neural network hyper parameters
-n_hidden = 2
-epochs = 1000
-learnrate = 0.5
+
 
 
 
 for e in range(epochs):
     #del_w = np.zeros(weights.shape)
     del_w_input_hidden = np.zeros(weights_input_hidden.shape)
-    del_w_hidden_output = np.zero(weights_hidden_output)
+    del_w_hidden_output = np.zeros(weights_hidden_output.shape)
     #Loop through all records, x is the input, y is the target
     for x, y in zip(features.values, targets):
         #calculating the output
@@ -52,12 +54,14 @@ for e in range(epochs):
 
         #backprop error term for output unit is
 
-        BackErrorOutput = error * sigmoid_prime(x)
+        BackErrorOutput = error * output * (1 - output)
+
+        hidden_error = np.dot(BackErrorOutput, weights_hidden_output)
 
 
         #backprop error term for hidden unit is
 
-        BackErrorHidden =  BackErrorOutput * (hidden_output*(1-hidden_output))
+        BackErrorHidden =  hidden_error * hidden_output * (1-hidden_output)
 
         #the gradient descent step, the error times the gradient times the inputs
         #del_w += error * output * (1-output) * x
@@ -73,7 +77,9 @@ for e in range(epochs):
 
     #Printing out the mean square error on the training set
     if e % (epochs/ 10)== 0:
-        out = sigmoid(np.dot(features, weights))
+        #out = sigmoid(np.dot(features, weights))
+        hidden_output = sigmoid(np.dot(x, weights_input_hidden))
+        out = sigmoid(np.dot(hidden_output, weights_hidden_output))
         loss =np.mean((out - targets)**2)
         if last_loss and last_loss < loss:
             print("Train loss:", loss, " WARNING - Loss Increasing")
@@ -89,7 +95,7 @@ for e in range(epochs):
 
 hidden = sigmoid(np.dot(features_test,weights_input_hidden))
 out = sigmoid(np.dot(hidden, weights_hidden_output))
-predictions = test_out > 0.5
+predictions = out > 0.5
 accuracy = np.mean(predictions==targets_test)
 print("Prediction accuracy: {:.3f}". format(accuracy))
 
