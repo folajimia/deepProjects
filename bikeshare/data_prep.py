@@ -40,3 +40,22 @@ for each in quant_features:
 
 
 print(data.head())
+
+
+#splitting data into training ,testing and validation sets
+
+
+#save the last 21 days
+test_data = data[-21*24:]
+data = data[:-21*24]
+
+
+#seperate the data into features and targets
+target_fields = ['cnt', 'casual', 'registered']
+features, targets = data.drop(target_fields, axis = 1), data[target_fields]
+test_features, test_targets = test_data.drop(target_fields, axis = 1), test_data[target_fields]
+
+
+#Hold out the last 60 days of the remaining data as a validation set
+train_features, train_targets = features[:-60*24], targets[:-60*24]
+val_features, val_targets = features[-60*24:], targets[-60*24:]
