@@ -26,7 +26,21 @@ class NeuralNetwork(object):
 
         self.activation = lambda x: 1/(1 + np.exp(-x))
 
+    def train(self, input_list, target_list):
+        #convert input list to 2D array
+        inputs = np.array(input_list, ndim=2).T
+        targets = np.array(target_list, ndim=2).T
 
-        
+
+        # implementing the forward pass
+
+        # hidden layers
+
+        hidden_inputs = np.dot(self.weights_input_to_hidden, inputs)
+
+        hidden_outputs = np.dot(self.activation_function(hidden_inputs))
+
+
+
 
 
