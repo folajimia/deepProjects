@@ -1,5 +1,8 @@
 import numpy as np
+import sys
+
 from data_prep import features, targets, test_features, test_targets,train_features, train_targets,val_features, val_targets
+
 
 
 
@@ -60,6 +63,42 @@ class NeuralNetwork(object):
         #update weights
         self.weights_hidden_to_output += self.lr * output_errors * hidden_outputs.T
         self.weights_input_to_hidden += self.lr * hidden_errors * hidden_grad * inputs.T
+
+    def run(self, input_list):
+        #Run a forward pass through the network
+        inputs = np.array(input_list, ndmin = 2).T
+
+
+        #The forward pass#
+
+        #Hidden layer
+        hidden_inputs = np.dot(self.weights_input_to_hidden, inputs)
+        hidden_outputs = self.activation_function(hidden_inputs)
+
+        #output_layer
+
+        final_inputs = np.dot(self.weights_hidden_to_output, hidden_outputs)
+        final_outputs = final_inputs
+
+        return (final_outputs)
+
+    def MSE(y,Y):
+        return np.mean((y - Y)**2)
+
+
+# Set the hyperparameters here #
+epochs = 850
+learning_rate = 0.2
+hidden_nodes = 25
+output_nodes = 1
+
+N_i = train_features.shape[1]
+network = NeuralNetwork(N_i, hidden_nodes, output_nodes, learning_rate)
+losses = {'train':[], 'validation':[]}
+for e in range(epochs):
+    # go through a batch of 128 records from the training set
+    batch
+
 
 
 
