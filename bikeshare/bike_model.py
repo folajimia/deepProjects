@@ -1,5 +1,7 @@
 import numpy as np
 import sys
+import numpy as np
+import matplotlib.pyplot as plt
 
 from data_prep import features, targets, test_features, test_targets,train_features, train_targets,val_features, val_targets
 
@@ -27,12 +29,12 @@ class NeuralNetwork(object):
 
         # set activation function as a sigmoid function
 
-        self.activation = lambda x: 1/(1 + np.exp(-x))
+        self.activation_function = lambda x: 1/(1 + np.exp(-x))
 
     def train(self, input_list, target_list):
         #convert input list to 2D array
-        inputs = np.array(input_list, ndim=2).T
-        targets = np.array(target_list, ndim=2).T
+        inputs = np.array(input_list, ndmin=2).T
+        targets = np.array(target_list, ndmin=2).T
 
 
         # implementing the forward pass
@@ -41,10 +43,10 @@ class NeuralNetwork(object):
 
         hidden_inputs = np.dot(self.weights_input_to_hidden, inputs) #input to hidden layer
 
-        hidden_outputs = np.dot(self.activation_function(hidden_inputs)) #hidden layer out activation fn
+        hidden_outputs = self.activation_function(hidden_inputs) #hidden layer out activation fn
 
         #output layer
-        final_outputs = np.dot(self.weights_hidden_to_output, hidden_outputs) #signals into final output layer
+        final_inputs = np.dot(self.weights_hidden_to_output, hidden_outputs) #signals into final output layer
 
         final_outputs = final_inputs
 
@@ -83,7 +85,7 @@ class NeuralNetwork(object):
         return (final_outputs)
 
     def MSE(y,Y):
-        return np.mean((y - Y)**2)
+        return (np.mean((y - Y)**2))
 
 
 # Set the hyperparameters here #
@@ -97,8 +99,27 @@ network = NeuralNetwork(N_i, hidden_nodes, output_nodes, learning_rate)
 losses = {'train':[], 'validation':[]}
 for e in range(epochs):
     # go through a batch of 128 records from the training set
-    batch
+    batch = np.random.choice(train_features.index, size=128)
+    for record , target in zip(train_features.ix[batch].values, train_targets.ix[batch]['cnt']):
+        network.train(record, target)
 
+    # Printing out the training progress
+    train_loss = NeuralNetwork.MSE(network.run(train_features), train_targets['cnt'].values)
+    val_loss = NeuralNetwork.MSE(network.run(val_features), val_targets['cnt'].values)
+    sys.stdout.write("\rProgress: " + str(100 * e/float(epochs))[:4] \
+                     +"% ... Training loss: " + str(train_loss)[:5] \
+                     +" ... Validation loss: " + str(val_loss)[:5])
+    losses['train'].append(train_loss)
+    losses['validation'].append(val_loss)
+
+
+#Graphs
+
+plt.plot(losses['train'], label='Training loss')
+plt.plot(losses['validation'], label='Validation loss')
+plt.legend()
+plt.ylim(ymax=0.5)
+plt.show()
 
 
 
