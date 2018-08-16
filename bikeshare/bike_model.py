@@ -118,12 +118,24 @@ for e in range(epochs):
 plt.plot(losses['train'], label='Training loss')
 plt.plot(losses['validation'], label='Validation loss')
 plt.legend()
-plt.ylim(ymax=0.5)
+#plt.ylim(ymax=0.5)
 plt.show()
 
 
 
+#check with test data
 
+fig, ax = plt.subplots(figsize(8,4))
 
+mean, std = network.run(test_features)* std + mean
+ax.plot(predictions[0], label='Prediction')
+ax.plot((test_targets['cnt']*std + mean).values, label='Data')
+ax.set_xlim(right=len(predictions))
+ax.legend()
+
+dates = pd.to_datetime(rides.ix[test_data.index]['dteday'])
+dates = dates.apply(lambda d: d.strftime('%b %d'))
+ax.set_xticks(np.arange(len(dates))[12::24])
+_ = ax.set_xticklabels(dates[12::24], rotation=45)
 
 
